@@ -7,6 +7,8 @@
 >  
 > If you're just starting out too — keep going. It gets better. **You** get better.
 
+I started learning to code in 2023 through hands-on projects and online courses, then moved into professional freelance and full-time development in 2025. These early builds were learning exercises — small, scoped projects used to practice core concepts before working on production systems.
+
 ---
 
 A front-end demo built as part of my learning journey.
