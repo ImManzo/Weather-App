@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weather Forecast App — Mansour Kanswa</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%2334506A'/%3E%3Cstop offset='60%25' stop-color='%231F3346'/%3E%3Cstop offset='100%25' stop-color='%2316242F'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Ctext x='32' y='42' font-family='Arial,Helvetica,sans-serif' font-size='32' font-weight='700' fill='%23ffffff' text-anchor='middle'%3EM%3C/text%3E%3C/svg%3E">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{ background:#FAFAF8; color:#1A1A1A; font-family:'Inter',-apple-system,sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased; }
+  .top-bar{ background:rgba(250,250,248,0.86); backdrop-filter:blur(10px); border-bottom:1px solid #E5E3DD; padding:16px 28px; display:flex; justify-content:space-between; align-items:center; }
+  .back-link{ font-family:'JetBrains Mono',monospace; font-size:13px; color:#6B6B6B; text-decoration:none; display:flex; align-items:center; gap:6px; transition:color .15s; }
+  .back-link:hover{ color:#1A1A1A; } .back-link svg{ width:14px; height:14px; }
+  .page-title{ font-size:13px; font-weight:600; color:#2D4356; letter-spacing:0.04em; }
+  .project-page{ max-width:900px; margin:0 auto; padding:40px 28px 60px; }
+  .project-header{ margin-bottom:40px; }
+  .project-header h1{ font-size:28px; font-weight:800; letter-spacing:-0.02em; margin-bottom:8px; }
+  .project-header p{ font-size:15px; color:#4A4A48; max-width:500px; }
+  .preview-section{ background:#fff; border:1px solid #E5E3DD; border-radius:14px; padding:40px; margin-bottom:40px; min-height:400px; }
+  .code-section h2{ font-size:13px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#1A1A1A; margin-bottom:16px; }
+  pre{ background:#1a1a2e; color:#e0e0e0; font-family:'JetBrains Mono',monospace; font-size:13px; line-height:1.7; padding:24px; border-radius:10px; overflow-x:auto; tab-size:2; }
+  .hl-kw{ color:#c792ea; } .hl-fn{ color:#82aaff; } .hl-str{ color:#c3e88d; } .hl-num{ color:#f78c6c; } .hl-cm{ color:#546e7a; font-style:italic; }
+  footer{ text-align:center; padding:30px 28px; border-top:1px solid #E5E3DD; font-family:'JetBrains Mono',monospace; font-size:11.5px; color:#6B6B6B; }
+
+  .weather-app{ max-width:420px; margin:0 auto; text-align:center; }
+  .weather-search{ position:relative; display:flex; gap:8px; margin-bottom:20px; }
+  .weather-search input{ flex:1; padding:10px 14px; border:1px solid #E5E3DD; border-radius:8px; font-size:14px; outline:none; }
+  .weather-search input:focus{ border-color:#2D4356; }
+  .weather-search button{ padding:10px 18px; background:#1A1A1A; color:#fff; border:none; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; }
+  .weather-search button:hover{ background:#2D4356; }
+  .suggestions{ position:absolute; top:100%; left:0; right:76px; background:#fff; border:1px solid #E5E3DD; border-top:none; border-radius:0 0 8px 8px; max-height:200px; overflow-y:auto; z-index:10; display:none; box-shadow:0 8px 20px rgba(0,0,0,0.08); }
+  .suggestions div{ padding:10px 14px; font-size:13px; cursor:pointer; text-align:left; border-bottom:1px solid #F5F5F0; }
+  .suggestions div:hover{ background:#E8EDF1; }
+  .suggestions div:last-child{ border-bottom:none; }
+  .weather-card{ background:linear-gradient(135deg,#667eea,#764ba2); border-radius:16px; padding:30px; color:#fff; }
+  .weather-city{ font-size:20px; font-weight:700; margin-bottom:4px; }
+  .weather-temp{ font-size:48px; font-weight:800; margin:8px 0; }
+  .weather-desc{ font-size:16px; opacity:.9; margin-bottom:16px; text-transform:capitalize; }
+  .weather-details{ display:flex; justify-content:space-around; font-size:13px; }
+  .weather-details div span{ display:block; opacity:.7; font-size:11px; }
+  .weather-error{ color:#e94560; font-size:14px; margin-top:12px; }
+</style>
+</head>
+<body>
+<div class="top-bar">
+  <a class="back-link" href="../../"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5m7-7l-7 7 7 7"/></svg>Back to portfolio</a>
+  <span class="page-title">Project / Weather Forecast App</span>
+</div>
+<div class="project-page">
+  <div class="project-header">
+    <h1>Weather Forecast App</h1>
+    <p>Search any city to get a live weather forecast.</p>
+  </div>
+  <div class="preview-section">
+    <div class="weather-app">
+      <div class="weather-search">
+        <input type="text" id="cityInput" placeholder="Search city..." value="London" autocomplete="off">
+        <button onclick="getWeather()">Search</button>
+        <div class="suggestions" id="suggestions"></div>
+      </div>
+      <div class="weather-card" id="weatherCard">
+        <div class="weather-city" id="cityName">London</div>
+        <div class="weather-temp" id="temp">--°C</div>
+        <div class="weather-desc" id="desc">--</div>
+        <div class="weather-details">
+          <div><span>Humidity</span><strong id="humidity">--</strong></div>
+          <div><span>Wind</span><strong id="wind">--</strong></div>
+          <div><span>Feels Like</span><strong id="feels">--</strong></div>
+        </div>
+      </div>
+      <div class="weather-error" id="weatherError"></div>
+    </div>
+  </div>
+  <div class="code-section">
+    <h2>Source Code</h2>
+    <pre><span class="hl-cm">// Weather App with city autocomplete + signed temps</span>
+<span class="hl-kw">const</span> cities = [<span class="hl-str">"Cairo"</span>,<span class="hl-str">"London"</span>,<span class="hl-str">"New York"</span>,<span class="hl-str">"Tokyo"</span>,<span class="hl-str">"Dubai"</span>,<span class="hl-str">"Istanbul"</span>,<span class="hl-str">/*...*/</span>];
+
+<span class="hl-kw">function</span> <span class="hl-fn">formatTemp</span>(t) {
+  <span class="hl-kw">const</span> r = <span class="hl-fn">Math</span>.<span class="hl-fn">round</span>(t);
+  <span class="hl-kw">return</span> (r &gt; <span class="hl-num">0</span> ? <span class="hl-str">"+"</span> : <span class="hl-str">""</span>) + r + <span class="hl-str">"°C"</span>;
+}
+
+<span class="hl-kw">function</span> <span class="hl-fn">showSuggestions</span>(value) {
+  <span class="hl-kw">const</span> filtered = cities.<span class="hl-fn">filter</span>(c =&gt;
+    c.<span class="hl-fn">toLowerCase</span>().<span class="hl-fn">startsWith</span>(value.<span class="hl-fn">toLowerCase</span>()));
+  sugg.<span class="hl-fn">innerHTML</span> = filtered.<span class="hl-fn">map</span>(c =&gt;
+    <span class="hl-str">`&lt;div onclick="selectCity('${c}')"&gt;${c}&lt;/div&gt;`</span>).<span class="hl-fn">join</span>(<span class="hl-str">""</span>);
+  sugg.style.display = filtered.length ? <span class="hl-str">"block"</span> : <span class="hl-str">"none"</span>;
+}
+
+<span class="hl-kw">async function</span> <span class="hl-fn">getWeather</span>() {
+  <span class="hl-kw">const</span> city = input.value.<span class="hl-fn">trim</span>() || <span class="hl-str">"London"</span>;
+  <span class="hl-kw">const</span> res = <span class="hl-kw">await</span> <span class="hl-fn">fetch</span>(
+    <span class="hl-str">`https://wttr.in/<span class="hl-fn">$</span>{<span class="hl-fn">encodeURIComponent</span>(city)}?format=j1`</span>);
+  <span class="hl-kw">const</span> data = <span class="hl-kw">await</span> res.<span class="hl-fn">json</span>();
+  <span class="hl-kw">if</span> (!data.current_condition) { <span class="hl-fn">showError</span>(<span class="hl-str">"City not found"</span>); <span class="hl-kw">return</span>; }
+  document.<span class="hl-fn">getElementById</span>(<span class="hl-str">"cityName"</span>).textContent = data.nearest_area[<span class="hl-num">0</span>].areaName[<span class="hl-num">0</span>].value;
+  document.<span class="hl-fn">getElementById</span>(<span class="hl-str">"temp"</span>).textContent = <span class="hl-fn">formatTemp</span>(data.current_condition[<span class="hl-num">0</span>].temp_C);
+  document.<span class="hl-fn">getElementById</span>(<span class="hl-str">"desc"</span>).textContent = data.current_condition[<span class="hl-num">0</span>].weatherDesc[<span class="hl-num">0</span>].value;
+  document.<span class="hl-fn">getElementById</span>(<span class="hl-str">"humidity"</span>).textContent = <span class="hl-str">`${data.current_condition[0].humidity}%`</span>;
+  document.<span class="hl-fn">getElementById</span>(<span class="hl-str">"wind"</span>).textContent = <span class="hl-str">`${data.current_condition[0].windspeedKmph} km/h`</span>;
+  document.<span class="hl-fn">getElementById</span>(<span class="hl-str">"feels"</span>).textContent = <span class="hl-fn">formatTemp</span>(data.current_condition[<span class="hl-num">0</span>].FeelsLikeC);
+}</pre>
+  </div>
+</div>
+<footer><span>Mansour Kanswa</span></footer>
+<script>
+  const cities = ["Cairo","Alexandria","Giza","Shubra El Kheima","Port Said","Suez","Luxor","Aswan","Mansoura","Tanta","Asyut","Ismailia","Fayyum","Zagazig","Damietta","Minya","Qena","Sohag","Beni Suef","Hurghada","London","New York","Tokyo","Paris","Dubai","Istanbul","Berlin","Madrid","Rome","Moscow","Beijing","Shanghai","Sydney","Mumbai","Delhi","Bangkok","Seoul","Singapore","Kuala Lumpur","Jakarta","Manila","Lagos","Nairobi","Cape Town","Casablanca","Tunis","Algiers","Riyadh","Jeddah","Mecca","Medina","Doha","Abu Dhabi","Kuwait City","Muscat","Amman","Beirut","Damascus","Baghdad","Tehran","Karachi","Lahore","Dhaka","Ho Chi Minh City","Hanoi","Hong Kong","Taipei","Los Angeles","Chicago","Toronto","Vancouver","Mexico City","São Paulo","Buenos Aires","Lima","Bogotá","Santiago","Athens","Lisbon","Brussels","Vienna","Warsaw","Prague","Budapest","Stockholm","Oslo","Helsinki","Copenhagen","Dublin","Zurich","Munich","Hamburg","Barcelona","Milan","Naples","Venice","Florence","Birmingham","Manchester","Liverpool","Glasgow","Edinburgh","Brisbane","Melbourne","Adelaide","Perth","Auckland","Wellington","Christchurch","Kolkata","Chennai","Bangalore","Hyderabad","Pune","Ahmedabad","Yangon","Phnom Penh","Vientiane","Ulaanbaatar","Tashkent","Almaty","Baku","Tbilisi","Yerevan","Kiev","Minsk","Riga","Tallinn","Vilnius","Sofia","Bucharest","Belgrade","Zagreb","Sarajevo","Skopje","Tirana","Reykjavik","Luxembourg","Monaco","Valletta","Nicosia","Manama","Kathmandu","Colombo","Malé","Port Louis","Maputo","Luanda","Kinshasa","Accra","Abidjan","Dakar","Bamako","Ouagadougou","Harare","Lusaka","Addis Ababa","Khartoum","Tripoli","Kampala","Kigali","Antananarivo","Dodoma","Yaoundé","Libreville","Brazzaville","Nouakchott","Conakry","Monrovia","Freetown","Bissau","Banjul","Porto-Novo","Lomé","Niamey","N'Djamena","Bangui","Juba","Mogadishu","Hargeisa","Djibouti","Asmara","Victoria","Moroni","São Tomé","Malabo","Praia","Bridgetown","Port of Spain","Kingston","Havana","Nassau","San Juan","Santo Domingo","Port-au-Prince","San José","Panama City","Guatemala City","San Salvador","Tegucigalpa","Managua","Belmopan","Quito","Caracas","Georgetown","Paramaribo","Cayenne","Montevideo","Asunción","La Paz","Sucre","Santiago","Valparaíso","Concepción","Córdoba","Rosario","Belo Horizonte","Rio de Janeiro","Brasília","Salvador","Fortaleza","Recife","Manaus","Porto Alegre","Curitiba","Campinas","Islamabad","Rawalpindi","Faisalabad","Multan","Peshawar","Quetta","Kandahar","Herat","Mazar-i-Sharif","Kabul","Bishkek","Dushanbe","Ashgabat","Astana","Bishkek","Riga","Tallinn","Vilnius","Chișinău","Ljubljana","Bratislava","Podgorica","Pristina","Andorra la Vella","Vaduz","San Marino","Wien","Graz","Linz","Salzburg","Innsbruck","Klagenfurt"];
+
+  const input = document.getElementById("cityInput");
+  const sugg = document.getElementById("suggestions");
+
+  function showSuggestions(value) {
+    if (!value) { sugg.style.display = "none"; return; }
+    const filtered = cities.filter(c => c.toLowerCase().startsWith(value.toLowerCase()));
+    if (!filtered.length) { sugg.style.display = "none"; return; }
+    sugg.innerHTML = filtered.map(c => `<div onclick="selectCity('${c}')">${c}</div>`).join("");
+    sugg.style.display = "block";
+  }
+
+  function selectCity(city) { input.value = city; sugg.style.display = "none"; getWeather(); }
+
+  input.addEventListener("input", () => showSuggestions(input.value));
+  input.addEventListener("blur", () => setTimeout(() => sugg.style.display = "none", 200));
+  input.addEventListener("focus", () => showSuggestions(input.value));
+
+  function formatTemp(t) {
+    const rounded = Math.round(t);
+    return (rounded > 0 ? "+" : "") + rounded + "°C";
+  }
+
+  async function getWeather() {
+    const city = input.value.trim() || "London";
+    try {
+      const res = await fetch(`https://wttr.in/${encodeURIComponent(city)}?format=j1`);
+      const data = await res.json();
+      if (!data.current_condition || !data.nearest_area || data.nearest_area.length === 0) { document.getElementById("weatherError").textContent = "City not found. Try a different name."; return; }
+      document.getElementById("weatherError").textContent = "";
+      const cc = data.current_condition[0];
+      const loc = data.nearest_area[0].areaName[0].value + ", " + data.nearest_area[0].country[0].value;
+      document.getElementById("cityName").textContent = loc;
+      document.getElementById("temp").textContent = formatTemp(parseFloat(cc.temp_C));
+      document.getElementById("desc").textContent = cc.weatherDesc[0].value;
+      document.getElementById("humidity").textContent = `${cc.humidity}%`;
+      document.getElementById("wind").textContent = `${cc.windspeedKmph} km/h`;
+      document.getElementById("feels").textContent = formatTemp(parseFloat(cc.FeelsLikeC));
+    } catch { document.getElementById("weatherError").textContent = "Could not fetch weather. Check the city name."; }
+  }
+  input.addEventListener("keydown", e => { if (e.key === "Enter") { sugg.style.display = "none"; getWeather(); } });
+  getWeather();
+</script>
+</body>
+</html>
